@@ -32,10 +32,11 @@
         }
 
         // Start notifications button click event
-        document.getElementById('start-notifications').addEventListener('click', () => {
-            intervalId = setInterval(sendNotification, 300000); // Send notification every 5 minutes (300000 milliseconds)
-            sendNotification(); // Send notification immediately after starting
-        });
+        // Start notifications button click event
+document.getElementById('start-notifications').addEventListener('click', () => {
+    intervalId = setInterval(sendNotification, 10000); // Send notification every 10 seconds (10000 milliseconds)
+    sendNotification(); // Send notification immediately after starting
+});
 
         // Stop notifications button click event
         document.getElementById('stop-notifications').addEventListener('click', () => {
