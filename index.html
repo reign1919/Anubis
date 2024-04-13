@@ -1,0 +1,69 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/png" href=" https://www.pngrepo.com/download/4624/malaysia.png">
+    <title>Scheduled Notification App</title>
+</head>
+<body>
+    <div class="container">
+        <div class="popup" id="popup">
+            <p>Please add the app to your home screen for proper functionality and allow notifications.</p>
+        </div>
+        <button id="start-notifications">Start Notifications</button>
+        <button id="stop-notifications">Stop Notifications</button>
+        <div class="footer">
+            Created by DEV-REIGN
+        </div>
+    </div>
+
+    <script>
+        let intervalId;
+
+        // Check if service worker is supported
+        if ('serviceWorker' in navigator) {
+            // Register the service worker
+            navigator.serviceWorker.register('service-worker.js')
+                .then(registration => console.log('Service Worker registered'))
+                .catch(error => console.error('Service Worker registration failed:', error));
+        }
+
+        // Start notifications button click event
+        document.getElementById('start-notifications').addEventListener('click', () => {
+            intervalId = setInterval(sendNotification, 3600000); // Send notification every hour (3600000 milliseconds)
+            sendNotification(); // Send notification immediately after starting
+        });
+
+        // Stop notifications button click event
+        document.getElementById('stop-notifications').addEventListener('click', () => {
+            clearInterval(intervalId);
+        });
+
+        // Function to send notification
+        async function sendNotification() {
+            try {
+                const reg = await navigator.serviceWorker.getRegistration();
+                const permission = await Notification.requestPermission();
+                if (permission === 'granted') {
+                    const malaysiaTime = new Date().toLocaleString('en-US', { timeZone: 'Asia/Kuala_Lumpur' });
+                    reg.showNotification('Maygh Time:', {
+                        body: 'The current time in Malaysia is ' + malaysiaTime,
+                        data: {
+                            url: window.location.href
+                        }
+                    });
+                } else {
+                    alert('You need to allow push notifications');
+                }
+            } catch (error) {
+                console.error('Error scheduling notification:', error);
+            }
+        }
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>
+
