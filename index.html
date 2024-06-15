@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles.css">
-    <link rel="icon" type="image/png" href="https://www.pngrepo.com/download/4624/malaysia.png">
+    <link rel="icon" type="image/png" href=" https://www.pngrepo.com/download/4624/malaysia.png">
     <title>Scheduled Notification App</title>
 </head>
 <body>
@@ -24,19 +24,22 @@
         let intervalId;
 
         // Check if service worker is supported
-        if ('serviceWorker' in navigator) {
-            // Register the service worker
-            navigator.serviceWorker.register('service-worker.js')
-                .then(registration => console.log('Service Worker registered'))
-                .catch(error => console.error('Service Worker registration failed:', error));
-        }
+        if ('serviceWorker' in navigator && 'PeriodicSyncManager' in window) {
+    navigator.serviceWorker.ready.then(registration => {
+        return registration.periodicSync.register('send-notification', {
+            minInterval: 10 * 60 * 1000, // 10 minutes
+        });
+    }).catch(error => console.error('Error registering for Periodic Background Sync:', error));
+} else {
+    // Fallback for browsers that do not support Periodic Background Sync
+    // You might want to use regular timed notifications or another method
+}
 
         // Start notifications button click event
-        // Start notifications button click event
-document.getElementById('start-notifications').addEventListener('click', () => {
-    intervalId = setInterval(sendNotification, 900000); // Send notification every 10 seconds (10000 milliseconds)
-    sendNotification(); // Send notification immediately after starting
-});
+        document.getElementById('start-notifications').addEventListener('click', () => {
+            intervalId = setInterval(sendNotification, 10000); // Send notification every hour (3600000 milliseconds)
+            sendNotification(); // Send notification immediately after starting
+        });
 
         // Stop notifications button click event
         document.getElementById('stop-notifications').addEventListener('click', () => {
@@ -45,25 +48,25 @@ document.getElementById('start-notifications').addEventListener('click', () => {
 
         // Function to send notification
         async function sendNotification() {
-            try {
-                const reg = await navigator.serviceWorker.getRegistration();
-                const permission = await Notification.requestPermission();
-                if (permission === 'granted') {
-                    const malaysiaTime = new Date().toLocaleString('en-US', { timeZone: 'Asia/Kuala_Lumpur' });
-                    reg.showNotification('Maygh Time:', {
-                        body: 'The current time in Malaysia is ' + malaysiaTime,
-                        data: {
-                            url: window.location.href
-                        }
-                    });
-                } else {
-                    alert('You need to allow push notifications');
-                }
-            } catch (error) {
-                console.error('Error scheduling notification:', error);
+        try {
+            const reg = await navigator.serviceWorker.getRegistration();
+            const permission = await Notification.requestPermission();
+            if (permission === 'granted') {
+                const malaysiaTime = new Date().toLocaleString('en-US', { timeZone: 'Asia/Kuala_Lumpur' });
+                reg.showNotification('Maygh Time:', {
+                    body: 'The current time in Malaysia is ' + malaysiaTime,
+                    data: { url: window.location.href },
+                    icon: '/path/to/your/icon.png' // Make sure to provide the correct path to your icon
+                });
+            } else {
+                alert('You need to allow push notifications');
             }
+        } catch (error) {
+            console.error('Error scheduling notification:', error);
         }
-    </script>
-    <script src="script.js"></script>
+    }
+</script>
+    <script src="service-worker.js"></script>
 </body>
 </html>
+
